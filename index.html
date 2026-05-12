@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lace &amp; Place Robotics — 106A Group 22</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #d9d9d9;
+    --bg-dim:    #c4c4c4;
+    --panel:     #ffffff;
+    --chrome:    #b8b8b8;
+    --chrome-2:  #9a9a9a;
+    --ink:       #1a1a1a;
+    --ink-soft:  #555;
+    --line:      #6e6e6e;
+    --accent:    #ff5b1a;   /* orange from slide 8 */
+    --accent-2:  #f5a623;
+    --accent-3:  #2ec27e;
+    --accent-4:  #3b82f6;
+    --accent-5:  #d946ef;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: 15px;
+    line-height: 1.55;
+    /* faint dotted desktop pattern */
+    background-image:
+      radial-gradient(rgba(0,0,0,0.07) 1px, transparent 1px);
+    background-size: 14px 14px;
+  }
+
+  /* ----- window chrome ----- */
+  .window {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    box-shadow:
+      0 0 0 1px #fff inset,
+      2px 2px 0 0 var(--chrome-2),
+      6px 6px 0 0 rgba(0,0,0,0.08);
+    margin: 0 0 48px 0;
+    overflow: hidden;
+  }
+  .titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(var(--chrome), var(--chrome-2));
+    border-bottom: 1px solid var(--line);
+    padding: 6px 10px;
+    font-size: 13px;
+    color: #1a1a1a;
+    user-select: none;
+  }
+  .titlebar .path {
+    font-family: "JetBrains Mono", monospace;
+    opacity: 0.85;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 12px;
+  }
+  .titlebar .controls {
+    display: inline-flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .titlebar .btn {
+    width: 22px; height: 18px;
+    background: var(--chrome);
+    border: 1px solid var(--line);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    box-shadow: 1px 1px 0 #fff inset;
+  }
+  .window-body { padding: 28px 32px 32px 32px; }
+
+  /* ----- layout ----- */
+  .container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 32px 24px 64px 24px;
+  }
+
+  h1, h2, h3 { font-family: "VT323", "JetBrains Mono", monospace; font-weight: 400; letter-spacing: 0.5px; }
+  h1 { font-size: 64px; line-height: 1.0; margin: 0 0 12px 0; }
+  h2 { font-size: 42px; line-height: 1.0; margin: 0 0 20px 0; }
+  h3 { font-size: 28px; line-height: 1.0; margin: 0 0 12px 0; }
+  p  { margin: 0 0 14px 0; }
+  ul { margin: 0 0 14px 0; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  a  { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  a:hover { color: var(--accent); }
+
+  /* ----- HERO ----- */
+  .hero .window-body {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 36px;
+    align-items: center;
+  }
+  .hero h1 { font-size: 92px; }
+  .hero .subtitle { color: var(--ink-soft); margin-bottom: 32px; font-size: 16px; }
+  .hero .authors {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 28px;
+    border-top: 1px dashed var(--line);
+    padding-top: 20px;
+  }
+  .author .name { font-weight: 700; font-size: 14px; }
+  .author .role { font-size: 11px; color: var(--ink-soft); margin-top: 2px; }
+
+  .photo-window { border: 1px solid var(--line); background: var(--chrome); box-shadow: 2px 2px 0 var(--chrome-2); }
+  .photo-window .mini-bar {
+    display: flex; justify-content: flex-end; gap: 4px;
+    padding: 4px 6px; background: linear-gradient(var(--chrome), var(--chrome-2));
+    border-bottom: 1px solid var(--line);
+  }
+  .photo-window .mini-bar .btn { width: 18px; height: 14px; background: var(--chrome); border: 1px solid var(--line); font-size: 9px; display: inline-flex; align-items: center; justify-content: center; }
+  .photo-window .pic {
+    aspect-ratio: 4 / 3;
+    background:
+      repeating-linear-gradient(45deg, #b0a89a 0 8px, #a59c8b 8px 16px);
+    position: relative;
+    overflow: hidden;
+  }
+  .photo-window .pic::after {
+    content: "shoe pile photo";
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(0,0,0,0.45); font-size: 14px;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
+  }
+
+  /* ----- generic two-col ----- */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+  .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+  /* ----- problem stats ----- */
+  .stat {
+    border: 1px solid var(--line);
+    padding: 28px 24px;
+    background: #fafafa;
+    box-shadow: 2px 2px 0 var(--chrome-2);
+  }
+  .stat .big { font-family: "VT323", monospace; font-size: 96px; line-height: 0.95; }
+  .stat .label { font-size: 13px; color: var(--ink-soft); }
+
+  /* dialog-style box (mimics slide 2's OK/Cancel/Apply window) */
+  .dialog {
+    border: 1px solid var(--line);
+    background: #fafafa;
+    box-shadow: 2px 2px 0 var(--chrome-2);
+  }
+  .dialog .body { padding: 24px; }
+  .dialog .actions {
+    display: flex; gap: 10px; justify-content: flex-end;
+    padding: 10px 14px;
+    border-top: 1px solid var(--line);
+    background: var(--chrome);
+  }
+  .dialog .actions button {
+    font-family: "JetBrains Mono", monospace;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    box-shadow: 1px 1px 0 #fff inset;
+    padding: 4px 14px;
+    font-size: 12px;
+    cursor: default;
+  }
+  .dialog .actions .ghost { color: var(--ink-soft); }
+
+  /* ----- pipeline diagram ----- */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 18px 0 8px 0;
+  }
+  .node {
+    border: 1px solid var(--line);
+    padding: 14px 12px 12px 12px;
+    background: #fff;
+    position: relative;
+    box-shadow: 2px 2px 0 var(--chrome-2);
+  }
+  .node .top { height: 4px; margin: -14px -12px 12px -12px; }
+  .node h4 {
+    font-family: "VT323", monospace; font-size: 22px;
+    margin: 0 0 6px 0; font-weight: 400;
+  }
+  .node p { font-size: 12px; color: var(--ink-soft); margin: 0; line-height: 1.5; }
+  .arrow {
+    text-align: center;
+    color: var(--ink-soft);
+    margin: 10px 0 6px 0;
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+
+  /* ----- IK execution row ----- */
+  .seq-frame {
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 18px 22px 24px 22px;
+    margin-top: 16px;
+    box-shadow: 2px 2px 0 var(--chrome-2);
+  }
+  .seq-frame .seq-label {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+  }
+  .seq {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    text-align: center;
+  }
+  .step .num {
+    font-family: "VT323", monospace;
+    font-size: 30px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .step .name { font-size: 12px; margin-top: 4px; font-weight: 500; }
+  .seq-loop {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  /* ----- video grid ----- */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+  }
+  .video-card {
+    border: 1px solid var(--line);
+    background: var(--chrome);
+    box-shadow: 2px 2px 0 var(--chrome-2);
+    overflow: hidden;
+  }
+  .video-card .mini-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 8px;
+    background: linear-gradient(var(--chrome), var(--chrome-2));
+    border-bottom: 1px solid var(--line);
+    font-size: 11px;
+  }
+  .video-card .mini-bar .controls { display: inline-flex; gap: 4px; }
+  .video-card .mini-bar .btn { width: 18px; height: 14px; background: var(--chrome); border: 1px solid var(--line); font-size: 9px; display: inline-flex; align-items: center; justify-content: center; }
+  .video-placeholder {
+    aspect-ratio: 16 / 9;
+    background:
+      repeating-linear-gradient(45deg, #2b2b2b 0 12px, #232323 12px 24px);
+    color: #e8e8e8;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 18px;
+    position: relative;
+  }
+  .video-placeholder .play {
+    width: 64px; height: 64px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 12px;
+    background: rgba(255,255,255,0.05);
+  }
+  .video-placeholder .play::after {
+    content: "";
+    display: block;
+    border-left: 16px solid #fff;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    margin-left: 4px;
+  }
+  .video-placeholder .title {
+    font-family: "VT323", monospace;
+    font-size: 24px;
+    line-height: 1.0;
+    color: #fff;
+  }
+  .video-placeholder .tag {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #b8b8b8;
+    letter-spacing: 1px;
+  }
+  .video-card .caption {
+    padding: 10px 12px;
+    background: #fafafa;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  /* ----- grasp filter cards ----- */
+  .grasp-card { display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; align-items: center; border: 1px solid var(--line); padding: 22px; background: #fff; box-shadow: 2px 2px 0 var(--chrome-2); }
+  .grasp-card + .grasp-card { margin-top: 22px; }
+  .grasp-card .visual {
+    aspect-ratio: 5 / 3;
+    background: #f3f3f3;
+    border: 1px dashed var(--line);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-soft);
+    font-size: 12px;
+    position: relative;
+  }
+  .grasp-card .visual .dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent-5);
+    box-shadow: 0 0 0 3px rgba(217,70,239,0.25);
+  }
+
+  /* tag chip */
+  .chip {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 1px solid var(--line);
+    background: var(--chrome);
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+
+  /* code line */
+  code, .mono {
+    font-family: "JetBrains Mono", monospace;
+    background: #f0f0f0;
+    border: 1px solid var(--line);
+    padding: 1px 6px;
+    font-size: 13px;
+  }
+
+  /* section accent stripe */
+  .top.orange { background: var(--accent); }
+  .top.amber  { background: var(--accent-2); }
+  .top.green  { background: var(--accent-3); }
+  .top.blue   { background: var(--accent-4); }
+  .top.pink   { background: var(--accent-5); }
+
+  /* footer */
+  footer {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 12px;
+    padding: 24px 0 8px 0;
+  }
+  footer a { color: var(--ink-soft); }
+
+  /* responsive */
+  @media (max-width: 880px) {
+    .hero .window-body { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 56px; }
+    .hero .authors { grid-template-columns: repeat(2, 1fr); }
+    .two-col { grid-template-columns: 1fr; }
+    .three-col { grid-template-columns: 1fr; }
+    .pipeline { grid-template-columns: 1fr 1fr; }
+    .seq { grid-template-columns: repeat(4, 1fr); row-gap: 18px; }
+    .video-grid { grid-template-columns: 1fr; }
+    .grasp-card { grid-template-columns: 1fr; }
+    h1 { font-size: 48px; }
+    h2 { font-size: 34px; }
+    .window-body { padding: 22px 18px 22px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ========== HERO ========== -->
+  <section class="window hero">
+    <div class="titlebar">
+      <span class="path">ros_workspaces\EE106a\FINAL_PROJECT</span>
+      <span class="controls">
+        <span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span>
+      </span>
+    </div>
+    <div class="window-body">
+      <div>
+        <h1>Lace &amp; Place<br>Robotics</h1>
+        <div class="subtitle">EECS / ME 106A &middot; Group 22 &middot; Final Project</div>
+
+        <p>A pick-and-place pipeline that perceives a pile of shoes, picks one
+        up with a UR7e, and places it on a rack — built on GroundingDINO + SAM
+        for vision, a custom point-cloud grasp filter, and MoveIt for motion
+        planning.</p>
+
+        <div>
+          <span class="chip">UR7e</span>
+          <span class="chip">ROS 2</span>
+          <span class="chip">MoveIt</span>
+          <span class="chip">GroundingDINO</span>
+          <span class="chip">SAM</span>
+          <span class="chip">Python</span>
+        </div>
+
+        <div class="authors">
+          <div class="author">
+            <div class="name">Anthony Kuang</div>
+            <div class="role">Computer Science</div>
+          </div>
+          <div class="author">
+            <div class="name">Austin Strohmeier</div>
+            <div class="role">Mechanical Engineering</div>
+          </div>
+          <div class="author">
+            <div class="name">Karanjot Singh</div>
+            <div class="role">Mechanical Engineering</div>
+          </div>
+          <div class="author">
+            <div class="name">Ziyuan Xu</div>
+            <div class="role">Computer Science</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="photo-window">
+        <div class="mini-bar">
+          <span class="controls">
+            <span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span>
+          </span>
+        </div>
+        <div class="pic"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PROBLEM ========== -->
+  <section class="window">
+    <div class="titlebar">
+      <span class="path">problem_statement.txt</span>
+      <span class="controls"><span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span></span>
+    </div>
+    <div class="window-body">
+      <h2>The Problem</h2>
+      <div class="two-col">
+        <div class="stat">
+          <div class="big">1 in 7</div>
+          <div class="label">U.S. adults are affected by limited mobility.<sup>1</sup></div>
+        </div>
+        <div class="dialog">
+          <div class="body">
+            <h3>Our Goal</h3>
+            <p>Provide robust robotic assistance to people with limited mobility
+            and students by organizing a random scene of shoes through
+            placement on a rack.</p>
+          </div>
+          <div class="actions">
+            <button>OK</button>
+            <button>Cancel</button>
+            <button class="ghost">Apply</button>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--ink-soft);margin-top:18px;">
+        <sup>1</sup> <a href="https://www.cdc.gov/disability-and-health/articles-documents/disabilities-health-care-access.html" target="_blank" rel="noopener">CDC — Disability &amp; Health</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== SYSTEM OVERVIEW ========== -->
+  <section class="window">
+    <div class="titlebar">
+      <span class="path">system_design.diagram</span>
+      <span class="controls"><span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span></span>
+    </div>
+    <div class="window-body">
+      <h2>System Design</h2>
+      <p>The full loop runs four stages — perception, point-cloud reasoning,
+      grasp verification, and motion execution — then repeats for the next
+      approved shoe.</p>
+
+      <div class="pipeline">
+        <div class="node">
+          <div class="top orange"></div>
+          <h4>Segmentation &amp; Pointcloud Gen</h4>
+          <p>Finetuned GroundingDINO + SAM produce a labeled mask. The mask is
+          fused with the dense depth map into a per-shoe point cloud.</p>
+        </div>
+        <div class="node">
+          <div class="top amber"></div>
+          <h4>Median / Mean / Mode Filtering</h4>
+          <p>Per-shoe point clouds are cleaned with class-specific filters to
+          isolate the top surface of the shoe.</p>
+        </div>
+        <div class="node">
+          <div class="top blue"></div>
+          <h4>Grasp Point Detection &amp; Verification</h4>
+          <p>A target grasp point and SO(2) rotation are extracted from the
+          filtered cloud and verified against the rack-side preview UI.</p>
+        </div>
+        <div class="node">
+          <div class="top green"></div>
+          <h4>Trajectory Planning &amp; Execution</h4>
+          <p>MoveIt plans a collision-free trajectory; the UR7e executes the
+          pick-and-place. Loops over every approved shoe in user-specified
+          order.</p>
+        </div>
+      </div>
+      <div class="arrow">▼  CV  →  IK  →  MoveIt  →  Execute  →  Repeat  ▼</div>
+    </div>
+  </section>
+
+  <!-- ========== VISION PIPELINE ========== -->
+  <section class="window">
+    <div class="titlebar">
+      <span class="path">cv/segmentation.py</span>
+      <span class="controls"><span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span></span>
+    </div>
+    <div class="window-body">
+      <h2>Vision Pipeline &amp; Segmentation</h2>
+      <div class="two-col">
+        <div>
+          <p>Each frame from the wrist-mounted camera is passed through a
+          finetuned <strong>GroundingDINO + SAM</strong> stack. We get tight
+          bounding boxes, a per-pixel mask, and a class label with confidence
+          for every shoe in the scene.</p>
+          <ul>
+            <li>Categorizes shoes into <em>sneaker</em>, <em>slipper</em>, or
+            <em>flip flop</em> with a confidence score.</li>
+            <li>Per-shoe orientation angle derived from a fitted rotated
+            rectangle on the 2D mask.</li>
+            <li>A web UI lets a human supervisor approve, re-label, or reject
+            any segment before execution.</li>
+            <li>The approved 2D mask is lifted into the depth point cloud to
+            seed grasp-point detection.</li>
+          </ul>
+        </div>
+
+        <div class="photo-window">
+          <div class="mini-bar">
+            <span class="controls"><span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span></span>
+          </div>
+          <div class="pic" style="aspect-ratio: 4/3; background:
+            repeating-linear-gradient(135deg, #cdd6e0 0 10px, #b9c2cd 10px 20px);">
+          </div>
+          <div class="caption" style="padding: 8px 10px; background: #fafafa; border-top: 1px solid var(--line); font-size: 11px; color: var(--ink-soft);">
+            Shoe Segment Approval — web_ui review interface
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== GRASP DETECTION ========== -->
+  <section class="window">
+    <div class="titlebar">
+      <span class="path">grasp/point_filter.py</span>
+      <span class="controls"><span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span></span>
+    </div>
+    <div class="window-body">
+      <h2>Grasp Point Detection</h2>
+      <p>Once a shoe is segmented, we need a single 3D point the gripper can
+      actually close on. Shoes are deformable and class-dependent, so we use a
+      different point-cloud filter per category.</p>
+
+      <div class="grasp-card">
+        <div>
+          <h3>Sneaker Filtering</h3>
+          <p>We crop the point cloud to the outer <strong>20%</strong> at each
+          end of the sneaker, keep the <strong>top 10%</strong> by height, and
+          take the higher of the two medians as the grasp target. This pushes
+          the gripper toward the heel collar, where the material is rigid
+          enough to lift cleanly.</p>
+          <p style="font-size:12px;color:var(--ink-soft);"><strong>Difficulties:</strong>
+          flexible upper material (gripper depth varies), orientation-specific
+          approach.</p>
+        </div>
+        <div class="visual">
+          <div style="text-align:center;">
+            <div class="dot" style="margin: 0 auto 10px auto;"></div>
+            <div>grasp point on heel collar</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grasp-card">
+        <div>
+          <h3>Slipper / Flip-Flop Filtering</h3>
+          <p>After transferring the 2D pixel mask onto the depth point cloud,
+          we keep only the <strong>top 8 mm</strong> by height and take the
+          median of that slab as the grasp target. The thin "top layer" trick
+          works on both soft slippers and flat flip-flops without per-shape
+          tuning.</p>
+        </div>
+        <div class="visual">
+          <div style="text-align:center;">
+            <div class="dot" style="margin: 0 auto 10px auto;"></div>
+            <div>grasp point on top 8&nbsp;mm slab</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== IK & PATH PLANNING ========== -->
+  <section class="window">
+    <div class="titlebar">
+      <span class="path">planning/lab5_bringup.launch.py</span>
+      <span class="controls"><span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span></span>
+    </div>
+    <div class="window-body">
+      <h2>IK and Path Planning</h2>
+      <p style="color:var(--ink-soft);">CV point → IK → MoveIt path → execute → repeat.</p>
+
+      <div class="three-col" style="margin-top: 18px;">
+        <div class="node">
+          <div class="top orange"></div>
+          <h4>Input</h4>
+          <p>CV pipeline output: target grasp point + SO(2) orientation.</p>
+        </div>
+        <div class="node">
+          <div class="top amber"></div>
+          <h4>Solver</h4>
+          <p>IK planner converts target pose to a feasible UR7e joint state.</p>
+        </div>
+        <div class="node">
+          <div class="top green"></div>
+          <h4>Planner</h4>
+          <p>MoveIt motion planning generates collision-free trajectories.</p>
+        </div>
+      </div>
+
+      <div class="seq-frame">
+        <div class="seq-label">EXECUTION SEQUENCE — REPEATED FOR EVERY APPROVED SHOE</div>
+        <div class="seq">
+          <div class="step"><div class="num">01</div><div class="name">High Tuck ↑</div></div>
+          <div class="step"><div class="num">02</div><div class="name">Pre-Grasp ↓</div></div>
+          <div class="step"><div class="num">03</div><div class="name">Grasp ↓</div></div>
+          <div class="step"><div class="num">04</div><div class="name">Close</div></div>
+          <div class="step"><div class="num">05</div><div class="name">Retract ↑</div></div>
+          <div class="step"><div class="num">06</div><div class="name">Drop-Off →</div></div>
+          <div class="step"><div class="num">07</div><div class="name">Repeat</div></div>
+        </div>
+        <div class="seq-loop">↺ Loop repeats for every approved shoe in order ( <code style="background:transparent;border:none;padding:0;color:var(--accent);">--order 0 1 2 …</code> )</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== VIDEOS ========== -->
+  <section class="window">
+    <div class="titlebar">
+      <span class="path">media\ur7e_demos</span>
+      <span class="controls"><span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span></span>
+    </div>
+    <div class="window-body">
+      <h2>Demo Videos</h2>
+      <p style="color:var(--ink-soft);">
+        Recordings of the UR7e running the full pipeline. Drop in the .mp4
+        files (or paste an embed URL) where the placeholders sit below.
+      </p>
+
+      <div class="video-grid">
+        <div class="video-card">
+          <div class="mini-bar">
+            <span>ur7e_demo_01.mp4</span>
+            <span class="controls"><span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span></span>
+          </div>
+          <div class="video-placeholder">
+            <div class="play"></div>
+            <div class="title">Full Run</div>
+            <div class="tag">PERCEPTION → PICK → PLACE</div>
+          </div>
+          <div class="caption">End-to-end run: messy pile in, organized rack out.</div>
+        </div>
+
+        <div class="video-card">
+          <div class="mini-bar">
+            <span>ur7e_demo_02.mp4</span>
+            <span class="controls"><span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span></span>
+          </div>
+          <div class="video-placeholder">
+            <div class="play"></div>
+            <div class="title">Sneaker Grasp</div>
+            <div class="tag">HEEL-COLLAR FILTER</div>
+          </div>
+          <div class="caption">Close-up: sneaker grasp using the 20%/10% point-cloud filter.</div>
+        </div>
+
+        <div class="video-card">
+          <div class="mini-bar">
+            <span>ur7e_demo_03.mp4</span>
+            <span class="controls"><span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span></span>
+          </div>
+          <div class="video-placeholder">
+            <div class="play"></div>
+            <div class="title">Slipper / Flip-Flop</div>
+            <div class="tag">TOP-8MM SLAB FILTER</div>
+          </div>
+          <div class="caption">Class-specific filter on soft slippers and flat flip-flops.</div>
+        </div>
+
+        <div class="video-card">
+          <div class="mini-bar">
+            <span>ur7e_demo_04.mp4</span>
+            <span class="controls"><span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span></span>
+          </div>
+          <div class="video-placeholder">
+            <div class="play"></div>
+            <div class="title">Web UI Approval</div>
+            <div class="tag">HUMAN-IN-THE-LOOP</div>
+          </div>
+          <div class="caption">Operator reviews segments + grasp previews before motion.</div>
+        </div>
+      </div>
+
+      <p style="margin-top:18px;font-size:12px;color:var(--ink-soft);">
+        <strong>To embed a video:</strong> replace each
+        <code>&lt;div class="video-placeholder"&gt;…&lt;/div&gt;</code> with a
+        <code>&lt;video src="…" controls&gt;&lt;/video&gt;</code> or a YouTube
+        <code>&lt;iframe&gt;</code>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== FUTURE WORK ========== -->
+  <section class="window">
+    <div class="titlebar">
+      <span class="path">future_work.md</span>
+      <span class="controls"><span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span></span>
+    </div>
+    <div class="window-body">
+      <h2>Problems Encountered &amp; Next Steps</h2>
+      <div class="two-col">
+        <div>
+          <h3>What hurt</h3>
+          <ul>
+            <li>Sneaker toe sags mid-trajectory, reducing rack-placement
+            accuracy.</li>
+            <li>Vision pipeline still mislabels under harsh lighting, which
+            blocks smart ordering.</li>
+            <li>The rack itself is hard-coded into the scene rather than
+            mapped, so collisions need wide margins.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>What's next</h3>
+          <ul>
+            <li>Pair-up arrangement and multi-shoe ordering driven by a more
+            robust segmenter.</li>
+            <li>Map the rack into the planning scene with Octomap (or
+            equivalent) for tighter, safer placement.</li>
+            <li>Assess free space on the rack and pick a semantic placement
+            slot rather than the next empty cell.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CTA / REPO ========== -->
+  <section class="window">
+    <div class="titlebar">
+      <span class="path">~/links</span>
+      <span class="controls"><span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span></span>
+    </div>
+    <div class="window-body" style="text-align:center;">
+      <h2>Code &amp; Resources</h2>
+      <p>The full ROS 2 source, CV pipeline, and shoe-approval web UI are open
+      on GitHub.</p>
+      <p style="margin-top: 20px;">
+        <a href="https://github.com/shimamooo/106a-final-project" target="_blank" rel="noopener"
+           style="display:inline-block; padding: 10px 22px; border: 1px solid var(--line); background: var(--bg); box-shadow: 2px 2px 0 var(--chrome-2); font-family: 'VT323', monospace; font-size: 22px; text-decoration: none;">
+          → github.com/shimamooo/106a-final-project
+        </a>
+      </p>
+      <p style="margin-top: 28px; font-size: 12px; color: var(--ink-soft);">
+        Quick start: <code>ros2 run ur7e_utils enable_comms</code> &nbsp;then&nbsp;
+        <code>ros2 launch planning lab5_bringup.launch.py</code>
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    Lace &amp; Place Robotics &middot; UC Berkeley EECS/ME 106A &middot; Spring 2026 &middot; Group 22
+  </footer>
+
+</div>
+
+</body>
+</html>
