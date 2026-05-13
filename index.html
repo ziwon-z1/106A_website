@@ -148,29 +148,64 @@
   .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 
   /* ----- problem stats ----- */
-  .stat {
-    border: 1px solid var(--line);
-    padding: 28px 24px;
-    background: #fafafa;
-    box-shadow: 2px 2px 0 var(--chrome-2);
+  .problem-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 0;
+    align-items: start;
   }
-  .stat .big { font-family: "VT323", monospace; font-size: 96px; line-height: 0.95; }
-  .stat .label { font-size: 13px; color: var(--ink-soft); }
 
-  /* dialog-style box (mimics slide 2's OK/Cancel/Apply window) */
-  .dialog {
-    border: 1px solid var(--line);
-    background: #fafafa;
-    box-shadow: 2px 2px 0 var(--chrome-2);
+  .stat-stack-wrapper {
+    padding-right: 28px;
+    padding-bottom: 28px;
   }
-  .dialog .body { padding: 24px; }
-  .dialog .actions {
-    display: flex; gap: 10px; justify-content: flex-end;
+
+  .stat-window {
+    background: #fff;
+    border: 1px solid var(--line);
+    box-shadow:
+      10px 10px 0 0 #fff,
+      10px 10px 0 1px var(--line),
+      20px 20px 0 0 #fff,
+      20px 20px 0 1px var(--line);
+  }
+
+  .stat-mini-bar {
+    display: flex; justify-content: flex-end; gap: 4px;
+    padding: 4px 6px;
+    background: linear-gradient(var(--chrome), var(--chrome-2));
+    border-bottom: 1px solid var(--line);
+  }
+  .stat-mini-bar .btn { width: 18px; height: 14px; background: var(--chrome); border: 1px solid var(--line); font-size: 9px; display: inline-flex; align-items: center; justify-content: center; }
+
+  .stat-body { padding: 28px 24px; text-align: center; }
+  .stat-body .big { font-family: "VT323", monospace; font-size: 96px; line-height: 0.95; }
+  .stat-body .label { font-size: 13px; color: var(--ink-soft); }
+
+  .goal-dialog {
+    margin-left: -30px;
+    margin-top: 60px;
+    position: relative;
+    z-index: 2;
+    background: #fff;
+    border: 1px solid var(--line);
+    box-shadow: 3px 3px 0 var(--chrome-2);
+  }
+  .goal-titlebar {
+    display: flex; justify-content: flex-end; gap: 4px;
+    padding: 4px 6px;
+    background: linear-gradient(var(--chrome), var(--chrome-2));
+    border-bottom: 1px solid var(--line);
+  }
+  .goal-titlebar .btn { width: 18px; height: 14px; background: var(--chrome); border: 1px solid var(--line); font-size: 9px; display: inline-flex; align-items: center; justify-content: center; }
+  .goal-body { padding: 24px; text-align: center; }
+  .goal-actions {
+    display: flex; gap: 10px; justify-content: center;
     padding: 10px 14px;
     border-top: 1px solid var(--line);
     background: var(--chrome);
   }
-  .dialog .actions button {
+  .goal-actions button {
     font-family: "JetBrains Mono", monospace;
     background: var(--bg);
     border: 1px solid var(--line);
@@ -179,7 +214,7 @@
     font-size: 12px;
     cursor: default;
   }
-  .dialog .actions .ghost { color: var(--ink-soft); }
+  .goal-actions .ghost { color: var(--ink-soft); }
 
   /* ----- pipeline diagram ----- */
   .pipeline {
@@ -373,6 +408,8 @@
     .hero h1 { font-size: 56px; }
     .hero .authors { grid-template-columns: repeat(2, 1fr); }
     .two-col { grid-template-columns: 1fr; }
+    .problem-layout { grid-template-columns: 1fr; }
+    .goal-dialog { margin-left: 0; margin-top: 24px; }
     .three-col { grid-template-columns: 1fr; }
     .pipeline { grid-template-columns: 1fr 1fr; }
     .seq { grid-template-columns: repeat(4, 1fr); row-gap: 18px; }
@@ -452,21 +489,32 @@
       <span class="path">problem_statement.txt</span>
       <span class="controls"><span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span></span>
     </div>
-    <div class="window-body">
+    <div class="window-body" >
       <h2>The Problem</h2>
-      <div class="two-col">
-        <div class="stat">
-          <div class="big">1 in 7</div>
-          <div class="label">U.S. adults are affected by limited mobility.<sup>1</sup></div>
-        </div>
-        <div class="dialog">
-          <div class="body">
-            <h3>Our Goal</h3>
-            <p>Provide robust robotic assistance to people with limited mobility
-            and students by organizing a random scene of shoes through
-            placement on a rack.</p>
+      <div class="problem-layout">
+        <div class="stat-stack-wrapper">
+          <div class="stat-window">
+            <div class="stat-mini-bar">
+              <span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span>
+            </div>
+            <div class="stat-body">
+              <div class="big">1 in 7</div>
+              <div class="label">Adults are affected by limited mobility<br>in the United States<sup>1</sup></div>
+            </div>
           </div>
-          <div class="actions">
+        </div>
+        <div class="goal-dialog">
+          <div class="goal-titlebar">
+            <span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span>
+          </div>
+          <div class="goal-body">
+            <h3>Our Goal:</h3>
+            <p>To provide robust robotic assistance to<br>
+            people with limited mobility and<br>
+            students by organizing a random scene of<br>
+            shoes through placement on a rack</p>
+          </div>
+          <div class="goal-actions">
             <button>OK</button>
             <button>Cancel</button>
             <button class="ghost">Apply</button>
