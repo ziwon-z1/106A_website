@@ -131,18 +131,16 @@
   }
   .photo-window .mini-bar .btn { width: 18px; height: 14px; background: var(--chrome); border: 1px solid var(--line); font-size: 9px; display: inline-flex; align-items: center; justify-content: center; }
   .photo-window .pic {
-    aspect-ratio: 4 / 3;
-    background:
-      repeating-linear-gradient(45deg, #b0a89a 0 8px, #a59c8b 8px 16px);
+    aspect-ratio: 1 / 1;
     position: relative;
     overflow: hidden;
   }
-  .photo-window .pic::after {
-    content: "shoe pile photo";
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    color: rgba(0,0,0,0.45); font-size: 14px;
-    text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
+  .photo-window .pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
   }
 
   /* ----- generic two-col ----- */
@@ -401,7 +399,7 @@
     <div class="window-body">
       <div>
         <h1>Lace &amp; Place<br>Robotics</h1>
-        <div class="subtitle">EECS / ME 106A &middot; Group 22 &middot; Final Project</div>
+        <div class="subtitle">EECS / ME 106A &middot; Group 22 </div>
 
         <p>A pick-and-place pipeline that perceives a pile of shoes, picks one
         up with a UR7e, and places it on a rack — built on GroundingDINO + SAM
@@ -443,7 +441,7 @@
             <span class="btn">_</span><span class="btn">▢</span><span class="btn">×</span>
           </span>
         </div>
-        <div class="pic"></div>
+        <div class="pic"><img src="shoe_pile.png" alt="Pile of shoes before sorting"></div>
       </div>
     </div>
   </section>
